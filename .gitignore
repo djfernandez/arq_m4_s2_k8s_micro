@@ -33,7 +33,7 @@ build/
 ### VS Code ###
 .vscode/
 
-### Mac ###
+### Mac ###git commit -m "first commit"
 .DS_Store
 
 ### Logs ###
