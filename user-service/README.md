@@ -106,7 +106,7 @@ mvn clean compile
 docker-compose -f ../docker-compose.yml up -d
 
 # Ver logs
-docker logs postgres-user
+docker logs postgres-user-dev
 
 ```
 
