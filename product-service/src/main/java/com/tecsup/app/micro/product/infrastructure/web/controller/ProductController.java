@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -59,19 +60,21 @@ public class ProductController {
     }
     
     /**
-     * Obtiene productos por usuario creador
+     * Obtiene productos por usuario creador (autenticado)
      */
     @GetMapping("/user/{userId}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<ProductResponse>> getProductsByUser(@PathVariable Long userId) {
         log.info("REST request to get products by user: {}", userId);
         List<Product> products = productApplicationService.getProductsByUser(userId);
         return ResponseEntity.ok(productDtoMapper.toResponseList(products));
     }
-    
+
     /**
-     * Crea un nuevo producto
+     * Crea un nuevo producto (solo ADMIN)
      */
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ProductResponse> createProduct(@Valid @RequestBody CreateProductRequest request) {
         log.info("REST request to create product: {}", request.getName());
         Product product = productDtoMapper.toDomain(request);
@@ -79,11 +82,12 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(productDtoMapper.toResponse(createdProduct));
     }
-    
+
     /**
-     * Actualiza un producto existente
+     * Actualiza un producto existente (solo ADMIN)
      */
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ProductResponse> updateProduct(
             @PathVariable Long id,
             @Valid @RequestBody UpdateProductRequest request) {
@@ -92,11 +96,12 @@ public class ProductController {
         Product updatedProduct = productApplicationService.updateProduct(id, product);
         return ResponseEntity.ok(productDtoMapper.toResponse(updatedProduct));
     }
-    
+
     /**
-     * Elimina un producto
+     * Elimina un producto (solo ADMIN)
      */
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
         log.info("REST request to delete product with id: {}", id);
         productApplicationService.deleteProduct(id);
