@@ -329,7 +329,8 @@ public class GetProductByIdUseCase {
 ```
 
 - SecurityConfig.java
-```
+
+```java
 package com.tecsup.app.micro.product.infrastructure.config;
 
 ...
@@ -381,7 +382,7 @@ public class SecurityConfig {
 ### 6.- Pruebas
 
 
-```
+```sh
 # Obtener producto sin login
 curl http://localhost:8082/api/products/1
 
