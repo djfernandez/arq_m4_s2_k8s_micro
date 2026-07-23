@@ -1,4 +1,4 @@
-#  Microservicio User-Service - Resilience4j
+#  Microservicio Product-Service - Resilience4j
 
 
 ### 1.- Modificar pom.xml
