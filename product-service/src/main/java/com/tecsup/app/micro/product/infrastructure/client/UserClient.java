@@ -1,12 +1,13 @@
 package com.tecsup.app.micro.product.infrastructure.client;
 
-
-import com.tecsup.app.micro.product.infrastructure.client.dto.UserDTO;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
+
+import com.tecsup.app.micro.product.infrastructure.client.dto.UserDTO;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
 @RequiredArgsConstructor

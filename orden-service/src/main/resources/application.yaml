@@ -4,7 +4,7 @@
 # Product Service - Configuración para Kubernetes
 
 server:
-  port: 8082
+  port: 8083
 
 spring:
   application:
@@ -61,3 +61,20 @@ logging:
   level:
     "[com.tecsup.app.micro.orden]": ${LOG_LEVEL:INFO}
     "[org.hibernate.SQL]": ${SQL_LOG_LEVEL:WARN}
+# ============================================
+# USER SERVICE URL - Comunicación entre servicios
+# ============================================
+# En Kubernetes, usar DNS interno
+# Formato: http://<service-name>.<namespace>.svc.cluster.local
+user:
+  service:
+    url: ${USER_SERVICE_URL:http://localhost:8081}
+
+# ============================================
+# PRODUCT SERVICE URL - Comunicación entre servicios
+# ============================================
+# En Kubernetes, usar DNS interno
+# Formato: http://<service-name>.<namespace>.svc.cluster.local
+product:
+  service:
+    url: ${PRODUCT_SERVICE_URL:http://localhost:8082}

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.tecsup.app.micro.product.application.service.ProductApplicationService;
@@ -76,6 +77,16 @@ public class ProductController {
         log.info("REST request to get product by id: {}", id);
         Product product = productApplicationService.getProductById(id);
         return ResponseEntity.ok(productDtoMapper.toResponse(product));
+    }
+
+    /**
+     * Obtiene un producto por ID (público)
+     */
+    @GetMapping("/ids")
+    public ResponseEntity<List<ProductResponse>> getProductsByIdsEntity(@RequestParam List<Long> ids) {
+        log.info("REST request to get products by ids: {}", ids);
+        List<Product> products = productApplicationService.getProductsByIds(ids);
+        return ResponseEntity.ok(productDtoMapper.toResponseList(products));
     }
 
     /**

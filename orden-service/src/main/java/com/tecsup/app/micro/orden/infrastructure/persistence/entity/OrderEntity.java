@@ -2,16 +2,15 @@ package com.tecsup.app.micro.orden.infrastructure.persistence.entity;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
@@ -32,8 +31,9 @@ public class OrderEntity {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @Column(name = "order_number", nullable = false, unique = true)
+  @Column(name = "order_number", nullable = false, unique = true, length = 50)
   private String orderNumber;
+
   @Column(name = "user_id", nullable = false)
   private Long userId;
 
@@ -48,6 +48,10 @@ public class OrderEntity {
 
   @Column(name = "updated_at")
   private LocalDateTime updatedAt;
+
+  // Relación con OrderItem
+  @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<OrderItemEntity> items;
 
   @PrePersist
   protected void onCreate() {

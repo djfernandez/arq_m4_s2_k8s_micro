@@ -1,8 +1,8 @@
 package com.tecsup.app.micro.user.infrastructure.config;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -13,7 +13,10 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+
 import com.tecsup.app.micro.user.infrastructure.security.CustomUserDetailsService;
+
+import lombok.RequiredArgsConstructor;
 
 /**
  * Configuración de Spring Security para user-service
@@ -23,16 +26,16 @@ import com.tecsup.app.micro.user.infrastructure.security.CustomUserDetailsServic
  * Sesión 2: Se reemplaza HTTP Basic por JWT (descomentar líneas marcadas)
  *
  * Endpoints:
- *   POST /api/auth/login       → público (Sesión 2)
- *   POST /api/auth/register    → público (Sesión 2)
- *   GET  /api/users/health     → público
- *   GET  /api/users/me         → autenticado
- *   GET/POST/PUT/DELETE /api/users/** → ADMIN
- *   Actuator /actuator/health  → público
+ * POST /api/auth/login → público (Sesión 2)
+ * POST /api/auth/register → público (Sesión 2)
+ * GET /api/users/health → público
+ * GET /api/users/me → autenticado
+ * GET/POST/PUT/DELETE /api/users/** → ADMIN
+ * Actuator /actuator/health → público
  */
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity  // Habilita @PreAuthorize, @Secured
+@EnableMethodSecurity // Habilita @PreAuthorize, @Secured
 @RequiredArgsConstructor
 public class SecurityConfig {
 
@@ -45,9 +48,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
 
                 // Política de sesión: STATELESS (sin estado en servidor)
-                .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                )
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                 // Reglas de autorización por URL
                 .authorizeHttpRequests(auth -> auth
@@ -58,11 +59,11 @@ public class SecurityConfig {
                         .requestMatchers("/actuator/health/**").permitAll()
 
                         // Solo ADMIN puede gestionar usuarios
-                        .requestMatchers("/api/users/**").hasRole("ADMIN")
+                        // .requestMatchers("/api/users/**").permitAll()// .hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/users/{id}").permitAll()
 
                         // Todo lo demás requiere autenticación
-                        .anyRequest().authenticated()
-                )
+                        .anyRequest().authenticated())
 
                 // =============================================
                 // Sesión 1: HTTP Basic (comentar en Sesión 2)
@@ -73,14 +74,13 @@ public class SecurityConfig {
                             response.setContentType("application/json");
                             response.getWriter().write(
                                     """
-                                            {
-                                                "error"  : "No autenticado", 
-                                                "status" : 401,
-                                                "message": "Debes autenticarte para acceder a este recurso"
-                                             }
-                                       """);
-                        })
-                )
+                                                 {
+                                                     "error"  : "No autenticado",
+                                                     "status" : 401,
+                                                     "message": "Debes autenticarte para acceder a este recurso"
+                                                  }
+                                            """);
+                        }))
 
                 // Manejo de errores de autorización (403)
                 .exceptionHandling(ex -> ex
@@ -89,14 +89,13 @@ public class SecurityConfig {
                             response.setContentType("application/json");
                             response.getWriter().write(
                                     """
-                                        {
-                                            "error"   : "Acceso denegado", 
-                                            "status"  : 403,
-                                            "message" : "No tienes permisos para acceder a este recurso"
-                                        }
-                                      """);
-                        })
-                );
+                                              {
+                                                  "error"   : "Acceso denegado",
+                                                  "status"  : 403,
+                                                  "message" : "No tienes permisos para acceder a este recurso"
+                                              }
+                                            """);
+                        }));
 
         return http.build();
     }

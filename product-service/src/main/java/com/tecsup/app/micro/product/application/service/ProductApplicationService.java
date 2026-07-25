@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.tecsup.app.micro.product.application.usecase.CreateProductUseCase;
 import com.tecsup.app.micro.product.application.usecase.DeleteProductUseCase;
+import com.tecsup.app.micro.product.application.usecase.GetAllProductsIdsUseCase;
 import com.tecsup.app.micro.product.application.usecase.GetAllProductsUseCase;
 import com.tecsup.app.micro.product.application.usecase.GetAvailableProductsUseCase;
 import com.tecsup.app.micro.product.application.usecase.GetProductByIdUseCase;
@@ -33,6 +34,7 @@ public class ProductApplicationService {
     private final CreateProductUseCase createProductUseCase;
     private final UpdateProductUseCase updateProductUseCase;
     private final DeleteProductUseCase deleteProductUseCase;
+    private final GetAllProductsIdsUseCase getAllProductsIdsUseCase;
 
     @Transactional(readOnly = true)
     public List<Product> getAllProducts() {
@@ -67,5 +69,10 @@ public class ProductApplicationService {
     @Transactional
     public void deleteProduct(Long id) {
         deleteProductUseCase.execute(id);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Product> getProductsByIds(List<Long> ids) {
+        return getAllProductsIdsUseCase.execute(ids);
     }
 }

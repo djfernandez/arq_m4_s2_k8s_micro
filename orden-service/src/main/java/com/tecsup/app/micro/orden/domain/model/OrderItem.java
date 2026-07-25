@@ -1,5 +1,9 @@
 package com.tecsup.app.micro.orden.domain.model;
 
+import java.math.BigDecimal;
+
+import com.tecsup.app.micro.orden.application.dto.ProductResumenDTO;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,18 +16,17 @@ import lombok.NoArgsConstructor;
 public class OrderItem {
 
   private Long id;
-  private Long order_id;
-  private Long product_id;
+  private Long orderId;
+  private Long productId;
   private Integer quantity;
-  private Double price;
-  private Double subtotal;
+  private BigDecimal unitPrice;
+  private BigDecimal subtotal;
+
+  private ProductResumenDTO product;
 
   public boolean isValid() {
-    return order_id != null && order_id > 0
-        && product_id != null && product_id > 0
-        && quantity != null && quantity > 0
-        && price != null && price >= 0
-        && subtotal != null && subtotal >= 0;
+    return productId != null && productId > 0
+        && quantity != null && quantity > 0;
   }
 
 }

@@ -23,20 +23,20 @@ import java.util.List;
  * MODIFICADO en Módulo 4 - Sesión 1: Se agregan anotaciones @PreAuthorize
  *
  * Reglas de acceso:
- *   GET    /api/users          → ADMIN
- *   GET    /api/users/{id}     → ADMIN
- *   GET    /api/users/me       → Autenticado (cualquier rol)
- *   POST   /api/users          → ADMIN
- *   PUT    /api/users/{id}     → ADMIN
- *   DELETE /api/users/{id}     → ADMIN
- *   GET    /api/users/health   → Público
+ * GET /api/users → ADMIN
+ * GET /api/users/{id} → ADMIN
+ * GET /api/users/me → Autenticado (cualquier rol)
+ * POST /api/users → ADMIN
+ * PUT /api/users/{id} → ADMIN
+ * DELETE /api/users/{id} → ADMIN
+ * GET /api/users/health → Público
  */
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
 @Slf4j
 public class UserController {
-    
+
     private final UserApplicationService userApplicationService;
     private final UserDtoMapper userDtoMapper;
 
@@ -66,15 +66,14 @@ public class UserController {
                 UserResponse.builder()
                         .email(authentication.getName())
                         .name(authentication.getName())
-                        .build()
-        );
+                        .build());
     }
 
     /**
      * Obtiene un usuario por ID (solo ADMIN)
      */
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    // @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UserResponse> getUserById(@PathVariable Long id) {
         log.info("REST request to get user by id: {}", id);
         User user = userApplicationService.getUserById(id);
@@ -118,7 +117,7 @@ public class UserController {
         userApplicationService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
-    
+
     /**
      * Endpoint de salud (público, sin autenticación)
      */

@@ -2,6 +2,8 @@ package com.tecsup.app.micro.orden.infrastructure.persistence.repository;
 
 import java.time.LocalDateTime;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+
 import java.util.Optional;
 
 import com.tecsup.app.micro.orden.infrastructure.persistence.entity.OrderEntity;
@@ -14,4 +16,7 @@ public interface JpaOrderRepository extends JpaRepository<OrderEntity, Long> {
   Optional<OrderEntity> findByCreatedAt(LocalDateTime createdAt);
 
   Optional<OrderEntity> findByStatus(String status);
+
+  @Query("SELECT MAX(o.id) FROM OrderEntity o")
+  Long maxOrderNumber();
 }

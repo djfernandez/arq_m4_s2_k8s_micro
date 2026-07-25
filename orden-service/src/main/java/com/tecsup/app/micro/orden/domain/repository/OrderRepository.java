@@ -42,4 +42,9 @@ public interface OrderRepository {
    */
   boolean existsById(Long id);
 
+  /**
+   * Obtiene el número de orden máximo
+   */
+  Long maxOrderNumber();
+
 }

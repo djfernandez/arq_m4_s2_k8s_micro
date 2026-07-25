@@ -7,8 +7,10 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Repository;
 
 import com.tecsup.app.micro.orden.domain.model.Order;
+import com.tecsup.app.micro.orden.domain.model.OrderItem;
 import com.tecsup.app.micro.orden.domain.repository.OrderRepository;
 import com.tecsup.app.micro.orden.infrastructure.persistence.entity.OrderEntity;
+import com.tecsup.app.micro.orden.infrastructure.persistence.entity.OrderItemEntity;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -58,6 +60,9 @@ public class OrderRepositoryImpl implements OrderRepository {
   public Order save(Order order) {
     log.debug("Saving order: {}", order);
     OrderEntity entity = toEntity(order);
+    if (entity.getItems() != null) {
+      entity.getItems().forEach(item -> item.setOrder(entity));
+    }
     OrderEntity savedEntity = jpaOrderRepository.save(entity);
     return toDomain(savedEntity);
   }
@@ -73,6 +78,11 @@ public class OrderRepositoryImpl implements OrderRepository {
     log.debug("Checking if order exists by id: {}", id);
     return jpaOrderRepository.existsById(id);
   }
+
+  @Override
+  public Long maxOrderNumber() {
+    return jpaOrderRepository.maxOrderNumber();
+  }
   // Implementación del repositorio de Orden (Adaptador)
   // Conecta el dominio con la infraestructura de persistencia
 
@@ -81,22 +91,40 @@ public class OrderRepositoryImpl implements OrderRepository {
   private Order toDomain(OrderEntity entity) {
     return Order.builder()
         .id(entity.getId())
-        .user_id(entity.getUserId())
+        .orderNumber(entity.getOrderNumber())
+        .userId(entity.getUserId())
         .status(entity.getStatus())
-        .total_amount(entity.getTotalAmount())
-        .created_at(entity.getCreatedAt())
-        .updated_at(entity.getUpdatedAt())
+        .totalAmount(entity.getTotalAmount())
+        .items(entity.getItems()
+            .stream()
+            .map(item -> OrderItem.builder()
+                .id(item.getId())
+                .orderId(entity.getId())
+                .productId(item.getProductId())
+                .quantity(item.getQuantity())
+                .unitPrice(item.getUnitPrice())
+                .subtotal(item.getSubTotal())
+                .build())
+            .collect(Collectors.toList()))
         .build();
   }
 
   private OrderEntity toEntity(Order order) {
     return OrderEntity.builder()
-        .id(order.getId())
-        .userId(order.getUser_id())
+        .orderNumber(order.getOrderNumber())
+        .userId(order.getUserId())
         .status(order.getStatus())
-        .totalAmount(order.getTotal_amount())
-        .createdAt(order.getCreated_at())
-        .updatedAt(order.getUpdated_at())
+        .totalAmount(order.getTotalAmount())
+        .items(order.getItems()
+            .stream()
+            .map(item -> OrderItemEntity.builder()
+                .productId(item.getProductId())
+                .quantity(item.getQuantity())
+                .unitPrice(item.getUnitPrice())
+                .subTotal(item.getSubtotal())
+                .build())
+            .collect(Collectors.toList()))
         .build();
   }
+
 }
