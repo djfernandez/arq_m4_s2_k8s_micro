@@ -1,12 +1,12 @@
 package com.tecsup.app.micro.product.domain.model;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 /**
  * Product Domain Model (Core Business Entity)
@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Product {
-    
+
     private Long id;
     private String name;
     private String description;
@@ -27,23 +27,25 @@ public class Product {
     private Long createdBy;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    
+
+    private User createdByUser; // Relación con el usuario que creó el producto (opcional)
+
     /**
      * Valida que el producto tenga los datos mínimos requeridos
      */
     public boolean isValid() {
         return name != null && !name.trim().isEmpty()
-            && price != null && price.compareTo(BigDecimal.ZERO) >= 0
-            && stock != null && stock >= 0;
+                && price != null && price.compareTo(BigDecimal.ZERO) >= 0
+                && stock != null && stock >= 0;
     }
-    
+
     /**
      * Verifica si el producto está disponible (stock > 0)
      */
     public boolean isAvailable() {
         return stock != null && stock > 0;
     }
-    
+
     /**
      * Reduce el stock del producto
      */
@@ -53,7 +55,7 @@ public class Product {
         }
         this.stock -= quantity;
     }
-    
+
     /**
      * Aumenta el stock del producto
      */

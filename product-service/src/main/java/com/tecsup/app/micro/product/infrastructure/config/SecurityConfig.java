@@ -1,6 +1,5 @@
 package com.tecsup.app.micro.product.infrastructure.config;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -10,26 +9,28 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import lombok.RequiredArgsConstructor;
 
 /**
  * Configuración de Spring Security para product-service
  *
  * Paquete: com.tecsup.app.micro.product.infrastructure.config
  * Sesión 1: Autorización por URL
- * Sesión 2: Validación de JWT (product-service NO genera tokens, solo los valida)
+ * Sesión 2: Validación de JWT (product-service NO genera tokens, solo los
+ * valida)
  *
  * Endpoints:
- *   GET  /api/products             → público
- *   GET  /api/products/available   → público
- *   GET  /api/products/{id}        → público
- *   GET  /api/products/user/{userId} → autenticado
- *   POST /api/products             → ADMIN
- *   PUT  /api/products/{id}        → ADMIN
- *   DELETE /api/products/{id}      → ADMIN
- *   POST /api/orders               → autenticado (Sesión 3)
- *   GET  /api/products/health      → público
- *   Actuator /actuator/health      → público
+ * GET /api/products → público
+ * GET /api/products/available → público
+ * GET /api/products/{id} → público
+ * GET /api/products/user/{userId} → autenticado
+ * POST /api/products → ADMIN
+ * PUT /api/products/{id} → ADMIN
+ * DELETE /api/products/{id} → ADMIN
+ * POST /api/orders → autenticado (Sesión 3)
+ * GET /api/products/health → público
+ * Actuator /actuator/health → público
  */
 @Configuration
 @EnableWebSecurity
@@ -42,9 +43,7 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
 
-                .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                )
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                 .authorizeHttpRequests(auth -> auth
                         // Endpoints públicos (lectura de productos)
@@ -60,9 +59,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/api/products/**").hasRole("ADMIN")
 
                         // Todo lo demás requiere autenticación
-                        .anyRequest().authenticated()
-                )
-
+                        .anyRequest().authenticated())
 
                 // Manejo de errores
                 .exceptionHandling(ex -> ex
@@ -71,7 +68,7 @@ public class SecurityConfig {
                             response.setContentType("application/json");
                             response.getWriter().write("""
                                         {
-                                            "error": "No autenticado", 
+                                            "error": "No autenticado",
                                             "status": 401,
                                             "message": "Debes autenticarte para acceder a este recurso"
                                          }
@@ -82,13 +79,12 @@ public class SecurityConfig {
                             response.setContentType("application/json");
                             response.getWriter().write("""
                                         {
-                                            "error": "Acceso denegado", 
+                                            "error": "Acceso denegado",
                                             "status": 403,
                                             "message": "No tienes permisos para acceder a este recurso"
                                          }
                                     """);
-                        })
-                );
+                        }));
 
         return http.build();
     }

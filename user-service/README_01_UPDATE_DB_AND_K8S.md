@@ -4,9 +4,9 @@
 
 <img src="images/userdb_update.png" alt="Estructura de la base de datos" />
 
+- Crear database/V4\_\_ADD_SECURITY_TABLES.sql
 
-- Crear database/V4__ADD_SECURITY_TABLES.sql
-```
+```sql
 -- ============================================
 -- Migration: V4__ADD_SECURITY_TABLES.sql
 -- Description: Crear tablas de seguridad (roles, user_roles)
@@ -67,9 +67,9 @@ CREATE INDEX idx_user_roles_role_id ON user_roles(role_id);
 CREATE INDEX idx_users_enabled ON users(enabled);
 ```
 
-- Crear database/V5__INSERT_SECURITY_DATA.sql
+- Crear database/V5\_\_INSERT_SECURITY_DATA.sql
 
-```
+```sql
 -- ============================================
 -- Migration: V5__INSERT_SECURITY_DATA.sql
 -- Description: Insertar roles y asignar credenciales a usuarios
@@ -151,14 +151,16 @@ INSERT INTO user_roles (user_id, role_id) VALUES
 (5, (SELECT id FROM roles WHERE name = 'ROLE_USER'));
 
 ```
+
 - Cargar migraciones a la base de datos : userdb
 
 ### 2.- Modificar manifestos k8s
 
 - Codificar en Base64 las nuevas variables de entorno (DB_PASSWORD y DB_USERNAME)
 
-- Modificar k8s/02-secret.yaml
-```
+- Modific yaml
+
+```yaml
 # ============================================
 # SECRET - Datos SENSIBLES (codificados en base64)
 # ============================================
@@ -177,13 +179,14 @@ type: Opaque
 
 # Valores codificados en base64 (más seguro que stringData)                          # CAMBIOS
 data:
-  DB_USERNAME: cG9zdGdyZXM=                                          # postgres
-  DB_PASSWORD: cG9zdGdyZXM=                                          # postgres
-  JWT_SECRET: bTFTM2NyM3RLM3lKV1RfVDNjc3VwMjAyNSFAI1NlY3VyZVRva2Vu  # m1S3cr3tK3yJWT_T3csup2025!@#SecureToken
+  DB_USERNAME: cG9zdGdyZXM= # postgres
+  DB_PASSWORD: cG9zdGdyZXM= # postgres
+  JWT_SECRET: bTFTM2NyM3RLM3lKV1RfVDNjc3VwMjAyNSFAI1NlY3VyZVRva2Vu # m1S3cr3tK3yJWT_T3csup2025!@#SecureToken
 ```
 
 - Modificar k8s/01-configmap.yaml: **Se elimina DB_USERNAME porque se movió al k8s/02-secret.yaml**
-```
+
+```yaml
 # ============================================
 # CONFIGMAP - Configuración NO sensible
 # ============================================
@@ -216,11 +219,11 @@ data:
 
   # JVM
   JAVA_OPTS: "-Xmx512m -Xms256m"
-
 ```
 
 - Modificar k8s/03-deployment.yaml: **Se eliminan las variables de entorno DB_USERNAME y DB_PASSWORD porque se movieron al k8s/02-secret.yaml**
-```
+
+```yaml
 # ============================================
 # DEPLOYMENT - Gestión de Pods
 # ============================================
@@ -236,7 +239,7 @@ spec:
   # ========================================
   # Número de réplicas (copias)
   # ========================================
-  replicas: 1  # Empezamos con 1 pod
+  replicas: 1 # Empezamos con 1 pod
 
   # ========================================
   # Selector: ¿Qué pods gestionar?
@@ -315,12 +318,12 @@ spec:
                 secretKeyRef:
                   name: user-service-secret
                   key: JWT_SECRET
-
 ```
 
 ### 3.- Desplegar en Kubernetes
 
 - Configurar Contexto para Docker Desktop
+
 ```
 # Ver los contextos
 kubectl config get-contexts
@@ -330,7 +333,8 @@ kubectl config use-context docker-desktop
 
 ```
 
-- Borrar el despliegue de user-service 
+- Borrar el despliegue de user-service
+
 ```
 # Borrar todo el namespace (incluye deployments, services, configmaps, secrets)
 kubectl delete -f k8s/00-namespace.yaml
@@ -341,6 +345,7 @@ kubectl delete -f k8s/04-service.yaml
 ```
 
 - Volver a desplegar user-service
+
 ```
 kubectl apply -f k8s/00-namespace.yaml
 kubectl apply -f k8s/01-configmap.yaml
@@ -350,23 +355,26 @@ kubectl apply -f k8s/04-service.yaml
 ```
 
 - Verificar el despliegue
+
 ```
-# Verificar el deployment  
+# Verificar el deployment
 kubectl get deployments -n user-service
 
 # Verificar Service
 kubectl get service -n user-service
- 
+
 # Verificar pods
-kubectl get pods -n user-service  
+kubectl get pods -n user-service
 ```
 
 - En caso necesites redesplegar (por ejemplo, después de corregir un error en el Deployment):
+
 ```
  kubectl rollout restart deployment user-service -n user-service
 ```
 
 - Ver logs
+
 ```
 # Ver logs
 kubectl logs -f <POD_NAME> -n user-service
@@ -377,6 +385,7 @@ kubectl describe pod <POD_NAME> -n user-service
 ```
 
 - Probar user-service
+
 ```
 # Health check
 curl http://localhost:30081/actuator/health
@@ -384,14 +393,18 @@ curl http://localhost:30081/actuator/health
 # Output esperado:
 # {"status":"UP","groups":["liveness","readiness"]}
 ```
+
 ### 4.- Listar users
+
 ```
 curl http://localhost:30081/api/users
 ```
 
 #### Ver logs
+
 ```
 # Ver logs de user-service
 kubectl logs -f <POD_NAME> -n user-service
 
 
+```

@@ -1,5 +1,18 @@
 package com.tecsup.app.micro.product.infrastructure.web.controller;
 
+import java.util.List;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.tecsup.app.micro.product.application.service.ProductApplicationService;
 import com.tecsup.app.micro.product.domain.model.Product;
@@ -7,30 +20,36 @@ import com.tecsup.app.micro.product.infrastructure.web.dto.CreateProductRequest;
 import com.tecsup.app.micro.product.infrastructure.web.dto.ProductResponse;
 import com.tecsup.app.micro.product.infrastructure.web.dto.UpdateProductRequest;
 import com.tecsup.app.micro.product.infrastructure.web.mapper.ProductDtoMapper;
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 /**
  * Controlador REST de Productos
+ * MODIFICADO en Módulo 4 - Sesión 1: Se agregan anotaciones @PreAuthorize
+ *
+ * Reglas de acceso:
+ * GET /api/products → público
+ * GET /api/products/available → público
+ * GET /api/products/{id} → público
+ * GET /api/products/user/{uid} → autenticado
+ * POST /api/products → ADMIN
+ * PUT /api/products/{id} → ADMIN
+ * DELETE /api/products/{id} → ADMIN
+ * GET /api/products/health → público
  */
 @RestController
 @RequestMapping("/api/products")
 @RequiredArgsConstructor
 @Slf4j
 public class ProductController {
-    
+
     private final ProductApplicationService productApplicationService;
     private final ProductDtoMapper productDtoMapper;
-    
+
     /**
-     * Obtiene todos los productos
+     * Obtiene todos los productos (público)
      */
     @GetMapping
     public ResponseEntity<List<ProductResponse>> getAllProducts() {
@@ -38,9 +57,9 @@ public class ProductController {
         List<Product> products = productApplicationService.getAllProducts();
         return ResponseEntity.ok(productDtoMapper.toResponseList(products));
     }
-    
+
     /**
-     * Obtiene productos disponibles (stock > 0)
+     * Obtiene productos disponibles (stock > 0) (público)
      */
     @GetMapping("/available")
     public ResponseEntity<List<ProductResponse>> getAvailableProducts() {
@@ -48,9 +67,9 @@ public class ProductController {
         List<Product> products = productApplicationService.getAvailableProducts();
         return ResponseEntity.ok(productDtoMapper.toResponseList(products));
     }
-    
+
     /**
-     * Obtiene un producto por ID
+     * Obtiene un producto por ID (público)
      */
     @GetMapping("/{id}")
     public ResponseEntity<ProductResponse> getProductById(@PathVariable Long id) {
@@ -58,7 +77,7 @@ public class ProductController {
         Product product = productApplicationService.getProductById(id);
         return ResponseEntity.ok(productDtoMapper.toResponse(product));
     }
-    
+
     /**
      * Obtiene productos por usuario creador (autenticado)
      */
@@ -107,9 +126,9 @@ public class ProductController {
         productApplicationService.deleteProduct(id);
         return ResponseEntity.noContent().build();
     }
-    
+
     /**
-     * Endpoint de salud
+     * Endpoint de salud (público)
      */
     @GetMapping("/health")
     public ResponseEntity<String> health() {

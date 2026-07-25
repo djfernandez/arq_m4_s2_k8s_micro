@@ -1,4 +1,4 @@
-name : databases
+name: databases
 services:
   # PostgreSQL para User Service
   postgres-user-dev:
@@ -30,11 +30,31 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=en_US.UTF-8"
     ports:
-      - "5433:5432"  # Puerto externo 5433, interno 5432
+      - "5433:5432" # Puerto externo 5433, interno 5432
     volumes:
       - postgres-product-dev-data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d productdb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # PostgreSQL para Orden Service
+  postgres-orden-dev:
+    image: postgres:15-alpine
+    container_name: postgres-orden-dev
+    environment:
+      POSTGRES_DB: ordendb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=en_US.UTF-8"
+    ports:
+      - "5435:5432" # Puerto externo 5435, interno 5432
+    volumes:
+      - postgres-orden-dev-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d ordendb"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -47,7 +67,7 @@ services:
     environment:
       PGADMIN_DEFAULT_EMAIL: admin@admin.com
       PGADMIN_DEFAULT_PASSWORD: admin
-      PGADMIN_CONFIG_SERVER_MODE: 'False'
+      PGADMIN_CONFIG_SERVER_MODE: "False"
     ports:
       - "5050:80"
     volumes:
@@ -55,12 +75,15 @@ services:
     depends_on:
       - postgres-user-dev
       - postgres-product-dev
+      - postgres-orden-dev
     restart: unless-stopped
 
 volumes:
   postgres-user-dev-data:
     driver: local
-  postgres-product-dev-data:  
+  postgres-product-dev-data:
+    driver: local
+  postgres-orden-dev-data:
     driver: local
   pgadmin-data:
     driver: local
