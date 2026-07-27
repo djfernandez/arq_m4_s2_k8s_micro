@@ -1,6 +1,9 @@
 package com.tecsup.app.micro.orden.infrastructure.client;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
@@ -19,13 +22,21 @@ public class UserClient {
   @Value("${user.service.url}")
   private String userServiceUrl;
 
-  public UserDTO getUserById(Long userId) {
+  public UserDTO getUserById(Long userId, String token) {
     log.info("Calling User Service (PostgreSQL userdb) to get user with id: {}", userId);
 
     String url = this.userServiceUrl + "/api/users/" + userId;
 
     try {
-      UserDTO user = restTemplate.getForObject(url, UserDTO.class);
+      HttpHeaders headers = new HttpHeaders();
+      headers.set("Authorization", token);
+      HttpEntity<String> entity = new HttpEntity<>(headers);
+
+      UserDTO user = restTemplate.exchange(
+          url,
+          HttpMethod.GET,
+          entity,
+          UserDTO.class).getBody();
       log.info("User retrieved successfully from userdb: {}", user);
       return user;
     } catch (Exception e) {

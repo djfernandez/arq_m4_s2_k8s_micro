@@ -1,5 +1,6 @@
 package com.tecsup.app.micro.orden.infrastructure.config;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -9,8 +10,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
-
-import lombok.RequiredArgsConstructor;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
  * Configuración de Spring Security para product-service
@@ -38,6 +38,11 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+  // =============================================
+  // Descomentar para Sesión 2 (JWT)
+  // =============================================
+  private final JwtAuthenticationFilter jwtAuthenticationFilter;
+
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http
@@ -54,12 +59,17 @@ public class SecurityConfig {
             .requestMatchers("/actuator/health/**").permitAll()
 
             // Solo ADMIN puede crear, actualizar, eliminar productos
-            .requestMatchers(HttpMethod.POST, "/api/orders").permitAll()// .hasRole("ADMIN")
+            .requestMatchers(HttpMethod.POST, "/api/orders").hasRole("ADMIN")
             .requestMatchers(HttpMethod.PUT, "/api/orders/**").hasRole("ADMIN")
             .requestMatchers(HttpMethod.DELETE, "/api/orders/**").hasRole("ADMIN")
 
             // Todo lo demás requiere autenticación
             .anyRequest().authenticated())
+
+        // =============================================
+        // Sesión 2: JWT (descomentar)
+        // =============================================
+        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
 
         // Manejo de errores
         .exceptionHandling(ex -> ex

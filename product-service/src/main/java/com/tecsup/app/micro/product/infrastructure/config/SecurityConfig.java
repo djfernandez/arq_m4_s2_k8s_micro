@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import lombok.RequiredArgsConstructor;
 
@@ -38,6 +39,11 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+    // =============================================
+    // Descomentar para Sesión 2 (JWT)
+    // =============================================
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -54,12 +60,18 @@ public class SecurityConfig {
                         .requestMatchers("/actuator/health/**").permitAll()
 
                         // Solo ADMIN puede crear, actualizar, eliminar productos
+                        .requestMatchers(HttpMethod.GET, "/api/products/ids").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/products").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/products/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/products/**").hasRole("ADMIN")
 
                         // Todo lo demás requiere autenticación
                         .anyRequest().authenticated())
+
+                // =============================================
+                // Sesión 2: JWT (descomentar)
+                // =============================================
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
 
                 // Manejo de errores
                 .exceptionHandling(ex -> ex

@@ -53,6 +53,7 @@ public class ProductController {
      * Obtiene todos los productos (público)
      */
     @GetMapping
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<ProductResponse>> getAllProducts() {
         log.info("REST request to get all products");
         List<Product> products = productApplicationService.getAllProducts();
@@ -63,6 +64,7 @@ public class ProductController {
      * Obtiene productos disponibles (stock > 0) (público)
      */
     @GetMapping("/available")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<ProductResponse>> getAvailableProducts() {
         log.info("REST request to get available products");
         List<Product> products = productApplicationService.getAvailableProducts();
@@ -73,6 +75,7 @@ public class ProductController {
      * Obtiene un producto por ID (público)
      */
     @GetMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ProductResponse> getProductById(@PathVariable Long id) {
         log.info("REST request to get product by id: {}", id);
         Product product = productApplicationService.getProductById(id);
@@ -83,6 +86,7 @@ public class ProductController {
      * Obtiene un producto por ID (público)
      */
     @GetMapping("/ids")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<ProductResponse>> getProductsByIdsEntity(@RequestParam List<Long> ids) {
         log.info("REST request to get products by ids: {}", ids);
         List<Product> products = productApplicationService.getProductsByIds(ids);

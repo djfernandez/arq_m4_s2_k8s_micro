@@ -27,7 +27,7 @@ public class CreateOrdertUseCase {
   private final UserClient userClient;
   private final ProductClient productClient;
 
-  public Order execute(Order order) {
+  public Order execute(Order order, String token) {
     // Validar datos de la orden
     if (!order.isValid()) {
       throw new InvalidOrderDataException("Invalid order data. Customer name and valid total amount are required.");
@@ -37,7 +37,7 @@ public class CreateOrdertUseCase {
       throw new InvalidOrderDataException("Invalid order items. At least one valid item is required.");
     }
 
-    UserDTO userDTO = userClient.getUserById(order.getUserId());
+    UserDTO userDTO = userClient.getUserById(order.getUserId(), token);
     if (userDTO == null) {
       throw new InvalidOrderDataException("User with ID " + order.getUserId() + " does not exist.");
     }
@@ -46,7 +46,7 @@ public class CreateOrdertUseCase {
         .map(item -> item.getProductId())
         .toList();
 
-    List<ProductDTO> products = productClient.getProductById(productIds);
+    List<ProductDTO> products = productClient.getProductById(productIds, token);
     if (products.size() != productIds.size()) {
       throw new InvalidOrderDataException("Some products in the order do not exist.");
     }

@@ -23,8 +23,8 @@ public class OrderApplicationService {
   private final GetMaxOrdersUseCase getMaxOrdersUseCase;
 
   @Transactional
-  public Order createOrder(Order order) {
-    return createOrderUseCase.execute(order);
+  public Order createOrder(Order order, String token) {
+    return createOrderUseCase.execute(order, token);
   }
 
   @Transactional(readOnly = true)

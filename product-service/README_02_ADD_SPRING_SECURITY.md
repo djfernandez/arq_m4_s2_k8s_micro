@@ -1,4 +1,4 @@
-#  Microservicio Product-Service - Seguridad y Despliegue en Kubernetes
+# Microservicio Product-Service - Seguridad y Despliegue en Kubernetes
 
 <img src="images/spring_security_class.png" alt="Spring Boot Logo" />
 
@@ -18,11 +18,13 @@
         <scope>test</scope>
     </dependency>
 ```
+
 ### 1.2.- Creación de clases
 
 #### 1.2.4. Configuración de seguridad
 
 - SecurityConfig.java
+
 ```java
 package com.tecsup.app.micro.product.infrastructure.config;
 
@@ -97,7 +99,7 @@ public class SecurityConfig {
                             response.setContentType("application/json");
                             response.getWriter().write("""
                                         {
-                                            "error": "No autenticado", 
+                                            "error": "No autenticado",
                                             "status": 401,
                                             "message": "Debes autenticarte para acceder a este recurso"
                                          }
@@ -108,7 +110,7 @@ public class SecurityConfig {
                             response.setContentType("application/json");
                             response.getWriter().write("""
                                         {
-                                            "error": "Acceso denegado", 
+                                            "error": "Acceso denegado",
                                             "status": 403,
                                             "message": "No tienes permisos para acceder a este recurso"
                                          }
@@ -125,8 +127,9 @@ public class SecurityConfig {
 #### 1.2.5. Controladores con @PreAuthorize
 
 - ProductController.java
+
 ```java
-package com.tecsup.app.micro.product.presentation.controller;
+package com.tecsup.app.micro.product.infrastructure.config;
 
 import com.tecsup.app.micro.product.application.service.ProductApplicationService;
 import com.tecsup.app.micro.product.domain.model.Product;
@@ -261,6 +264,7 @@ public class ProductController {
 ### 1.3.- Verificar en localhost
 
 - Ejecutar la aplicación y probar los endpoints con Postman o curl.
+
 ```
 # Endpoint público → 200
 curl http://localhost:8082/api/products
@@ -323,10 +327,13 @@ curl http://localhost:8082/api/products
 ### 2.3.- Desplegar en Kubernetes (ver README.md)
 
 - En caso se haya modificado el código después del despliegue inicial, reiniciar el deployment para aplicar los cambios:
+
 ```
  kubectl rollout restart deployment product-service -n product-service
 ```
+
 - Verificar despliegue, servicio y pods:
+
 ```
 # Verificar despliegue
 kubectl get deployments -n product-service
@@ -344,7 +351,6 @@ kubectl describe pod <POD_NAME> -n product-service
 kubectl logs -f <POD_NAME> -n product-service
 
 ```
-
 
 ### 2.4.- Probar autenticación en Kubernetes
 
