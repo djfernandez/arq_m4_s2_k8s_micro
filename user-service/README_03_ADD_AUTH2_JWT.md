@@ -1,7 +1,7 @@
-#  Microservicio User-Service - JWT y OAuth 2.0 en Kubernetes
+# Microservicio User-Service - JWT y OAuth 2.0 en Kubernetes
 
+## JWT y OAuth 2.0
 
-## JWT y  OAuth 2.0
 ¿Por qué no basta HTTP Basic?
 
 El cliente envía email:password en cada petición codificado en Base64. Problemas:
@@ -13,11 +13,10 @@ El cliente envía email:password en cada petición codificado en Base64. Problem
 
 JWT resuelve esto: el servidor valida una vez, genera un token firmado, y el cliente lo presenta en cada request. El servidor solo verifica la firma, sin consultar BD.
 
-##  JWT (JSON Web Token)
-
-
+## JWT (JSON Web Token)
 
 #### Flujo JWT en nuestra arquitectura
+
 ```
 ┌──────────┐     POST /api/auth/login       ┌──────────-────┐
 │  Cliente  │ ──── email + password ───────→│ user-service  │
@@ -41,21 +40,21 @@ OAuth 2.0 es un **framework de autorización** (no de autenticación). Define c�
 
 **Roles:**
 
-| Rol | En nuestro proyecto |
-|-----|-------------------|
-| Resource Owner | El usuario (Juan, María) |
-| Client | La aplicación frontend (curl, Postman, React app) |
-| Authorization Server | user-service (genera JWT) / en prod: AWS Cognito |
-| Resource Server | user-service, product-service (validan JWT) |
+| Rol                  | En nuestro proyecto                               |
+| -------------------- | ------------------------------------------------- |
+| Resource Owner       | El usuario (Juan, María)                          |
+| Client               | La aplicación frontend (curl, Postman, React app) |
+| Authorization Server | user-service (genera JWT) / en prod: AWS Cognito  |
+| Resource Server      | user-service, product-service (validan JWT)       |
 
 **Flows principales:**
 
-| Flow | Cuándo usarlo |
-|------|--------------|
-| **Authorization Code** | Apps con frontend (browser). El más seguro. Redirect al auth server, obtiene code, intercambia por token. |
-| **Authorization Code + PKCE** | SPAs y apps móviles (sin backend seguro). Agrega code_verifier para prevenir intercepción. |
-| **Client Credentials** | Servicio-a-servicio (sin usuario). El cliente se autentica con client_id + client_secret. |
-| **Resource Owner Password** | **Lo que usamos en el lab.** El cliente envía email+password directo. Simple pero menos seguro. Solo para APIs propias de confianza. |
+| Flow                          | Cuándo usarlo                                                                                                                        |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| **Authorization Code**        | Apps con frontend (browser). El más seguro. Redirect al auth server, obtiene code, intercambia por token.                            |
+| **Authorization Code + PKCE** | SPAs y apps móviles (sin backend seguro). Agrega code_verifier para prevenir intercepción.                                           |
+| **Client Credentials**        | Servicio-a-servicio (sin usuario). El cliente se autentica con client_id + client_secret.                                            |
+| **Resource Owner Password**   | **Lo que usamos en el lab.** El cliente envía email+password directo. Simple pero menos seguro. Solo para APIs propias de confianza. |
 
 Nuestro `POST /api/auth/login` es esencialmente el flow **Resource Owner Password Credentials** simplificado.
 
@@ -63,12 +62,9 @@ Nuestro `POST /api/auth/login` es esencialmente el flow **Resource Owner Passwor
 
 ## Estructura
 
-
-
 <img src="images/auth2_jwt_class.png" width="500"/>
 
 ## 1.- Modificar aplicación para agregar JWT
-
 
 ```xml
 .
@@ -103,13 +99,15 @@ Nuestro `POST /api/auth/login` es esencialmente el flow **Resource Owner Passwor
         </dependency>
 
 ```
+
 ### 1.2.- Creación de clases
 
 #### 1.2.1. DTOs de autenticación
 
-- LoginRequest.java 
+- LoginRequest.java
+
 ```java
-package com.tecsup.app.micro.user.presentation.dto;
+package com.tecsup.app.micro.user.infrastructure.web.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -141,8 +139,9 @@ public class LoginRequest {
 ```
 
 - LoginResponse.java
+
 ```java
-package com.tecsup.app.micro.user.presentation.dto;
+package com.tecsup.app.micro.user.infrastructure.web.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -173,7 +172,7 @@ public class LoginResponse {
 
 #### 1.2.2. Generación y validación de JWT
 
-- JwtTokenProvider.java 
+- JwtTokenProvider.java
 
 Genera y valida tokens. El JWT_SECRET viene de application.yaml (local) o del K8s Secret (Kubernetes)
 
@@ -290,7 +289,6 @@ public class JwtTokenProvider {
 
 Valida JWT y carga el usuario desde la BD con CustomUserDetailsService.
 
-
 ```java
 
 package com.tecsup.app.micro.user.infrastructure.config;
@@ -377,6 +375,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 #### 1.2.4. Activar JWT en SecurityConfig
 
 - SecurityConfig.java
+
 ```java
 package com.tecsup.app.micro.user.infrastructure.config;
 
@@ -483,7 +482,7 @@ public class SecurityConfig {
                             response.getWriter().write(
                                     """
                                         {
-                                            "error": "No autenticado", 
+                                            "error": "No autenticado",
                                             "status": 401,
                                             "message": "Debes autenticarte para acceder a este recurso"
                                         }
@@ -495,7 +494,7 @@ public class SecurityConfig {
                             response.getWriter().write(
                                     """
                                         {
-                                            "error"   : "Acceso denegado", 
+                                            "error"   : "Acceso denegado",
                                             "status"  : 403,
                                             "message" : "No tienes permisos para acceder a este recurso"
                                         }
@@ -527,6 +526,7 @@ public class SecurityConfig {
 #### 1.2.5. Controlador de autenticación
 
 - AuthController.java
+
 ```java
 
 package com.tecsup.app.micro.user.presentation.controller;
@@ -637,22 +637,18 @@ public class AuthController {
 Agregar configuración de JWT
 
 ```yaml
-
-
 # ============================================
 # JWT CONFIGURATION (Sesión 2)
 # ============================================
 jwt:
   secret: ${JWT_SECRET:m1S3cr3tK3yJWT_T3csup2025!@#SecureToken}
-  expiration: 3600000  # 1 hora en milisegundos
-
-
-
+  expiration: 3600000 # 1 hora en milisegundos
 ```
 
 ### 1.3.- Verificar en localhost
 
 - Ejecutar la aplicación y probar los endpoints con Postman o curl.
+
 ```
 # Sin autenticación → 401
 curl http://localhost:8081/api/users
@@ -665,7 +661,6 @@ curl -u maria.garcia@example.com:user123 http://localhost:8081/api/users
 ```
 
 ## 2.- Desplegar en Kubernetes con AUTH2.0 y JWT
-
 
 ### 2.1.- Construir imagen Docker y probar localmente (ver README.md)
 
@@ -729,15 +724,19 @@ kubectl config get-contexts
 # Cambiar el contexto "docker-desktop"
 kubectl config use-context docker-desktop
 
-# Verificar el cambio 
+# Verificar el cambio
 kubectl config current-context
 
 ```
+
 - Reiniciar el deployment para aplicar los cambios:
+
 ```
  kubectl rollout restart deployment user-service -n user-service
 ```
+
 - Verificar despliegue, servicio y pods:
+
 ```
 # Verificar despliegue
 kubectl get deployments -n user-service
@@ -755,7 +754,6 @@ kubectl describe pod <POD_NAME> -n user-service
 kubectl logs -f <POD_NAME> -n user-service
 
 ```
-
 
 ### 2.3.- Probar autenticación en Kubernetes
 

@@ -76,7 +76,7 @@ public class CreateOrdertUseCase {
 
     BigDecimal totalAmount = order.getItems().stream()
         .map(item -> item.getSubtotal())
-        .reduce(BigDecimal.ZERO, BigDecimal::add);
+        .reduce(BigDecimal.ZERO, (a, b) -> a.add(b));
     order.setTotalAmount(totalAmount);
 
     log.info("Order total amount calculated successfully for user: {}", userDTO.getName());
@@ -86,12 +86,28 @@ public class CreateOrdertUseCase {
 
     Long maxOrderNumber = orderRepository.maxOrderNumber();
     String orderNumber = (maxOrderNumber != null) ? String.valueOf(maxOrderNumber + 1) : "1";
-    order.setOrderNumber("ORD-" + Year.now().getValue() + "-" + orderNumber);
+    order.setOrderNumber("ORD-" + Year.now().getValue() + "-00" + orderNumber);
     log.info("Order number generated successfully for user: {}", userDTO.getName());
 
     log.info("Order validated successfully for user: {}", userDTO.getName());
     // Guardar orden
     Order savedOrder = orderRepository.save(order);
+
+    // Asociar productos a los items de la orden
+    savedOrder.getItems().forEach(item -> {
+      products.stream()
+          .filter(product -> product.getId().equals(item.getProductId()))
+          .findFirst()
+          .ifPresent(product -> {
+            ProductResumenDTO productResumen = ProductResumenDTO.builder()
+                .id(product.getId())
+                .name(product.getName())
+                .price(product.getPrice())
+                .build();
+            item.setProduct(productResumen);
+          });
+    });
+
     return savedOrder;
   }
 
