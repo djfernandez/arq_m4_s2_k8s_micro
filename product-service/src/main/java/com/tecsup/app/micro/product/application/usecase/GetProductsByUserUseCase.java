@@ -17,7 +17,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class GetProductsByUserUseCase {
-    
+
     private final ProductRepository productRepository;
     private final UserClient userClient;
 
@@ -29,8 +29,6 @@ public class GetProductsByUserUseCase {
         // Validar que el usuario existe en userdb
         UserDTO user = userClient.getUserById(userId);
         log.info("Fetching products for user from userdb: {}", user.getName());
-
-        // TODO : Validar existencia de usuario o lanzar excepcion
 
         log.debug("Executing GetProductsByUserUseCase for userId: {}", userId);
         return productRepository.findByCreatedBy(userId);

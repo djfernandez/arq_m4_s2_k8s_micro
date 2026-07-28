@@ -19,11 +19,20 @@ public interface ProductDtoMapper {
     /**
      * Convierte CreateProductRequest a Product de dominio
      */
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "createdByUser", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
     Product toDomain(CreateProductRequest request);
     
     /**
      * Convierte UpdateProductRequest a Product de dominio
      */
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "createdByUser", ignore = true)
+    @Mapping(target = "createdBy", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
     Product toDomain(UpdateProductRequest request);
     
     /**

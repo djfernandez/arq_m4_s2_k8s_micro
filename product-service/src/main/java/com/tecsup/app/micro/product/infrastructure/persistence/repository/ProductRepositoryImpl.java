@@ -34,6 +34,9 @@ public class ProductRepositoryImpl implements ProductRepository {
     @Override
     public Optional<Product> findById(Long id) {
         log.debug("Finding product by id: {}", id);
+        if (id == null) {
+            return Optional.empty();
+        }
         return jpaProductRepository.findById(id)
                 .map(mapper::toDomain);
     }
@@ -67,12 +70,17 @@ public class ProductRepositoryImpl implements ProductRepository {
     @Override
     public void deleteById(Long id) {
         log.debug("Deleting product by id: {}", id);
-        jpaProductRepository.deleteById(id);
+        if (id != null) {
+            jpaProductRepository.deleteById(id);
+        }
     }
 
     @Override
     public boolean existsById(Long id) {
         log.debug("Checking if product exists: {}", id);
+        if (id == null) {
+            return false;
+        }
         return jpaProductRepository.existsById(id);
     }
 

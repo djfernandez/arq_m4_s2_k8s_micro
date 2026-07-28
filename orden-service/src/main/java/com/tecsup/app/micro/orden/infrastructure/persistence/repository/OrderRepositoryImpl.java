@@ -34,6 +34,9 @@ public class OrderRepositoryImpl implements OrderRepository {
   @Override
   public Optional<Order> findById(Long id) {
     log.debug("Finding order by id: {}", id);
+    if (id == null) {
+      return Optional.empty();
+    }
     return jpaOrderRepository.findById(id)
         .map(this::toDomain);
   }
@@ -70,12 +73,17 @@ public class OrderRepositoryImpl implements OrderRepository {
   @Override
   public void deleteById(Long id) {
     log.debug("Deleting order by id: {}", id);
-    jpaOrderRepository.deleteById(id);
+    if (id != null) {
+      jpaOrderRepository.deleteById(id);
+    }
   }
 
   @Override
   public boolean existsById(Long id) {
     log.debug("Checking if order exists by id: {}", id);
+    if (id == null) {
+      return false;
+    }
     return jpaOrderRepository.existsById(id);
   }
 
