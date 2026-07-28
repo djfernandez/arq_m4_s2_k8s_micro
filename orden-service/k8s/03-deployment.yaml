@@ -41,7 +41,7 @@ spec:
           # - Never: Solo usar imagen local (desarrollo)
           # - Always: Siempre descargar (producción)
           # - IfNotPresent: para local en Docker Desktop, si no está local, la descarga (desarrollo)
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
 
           # Puerto del contenedor
           ports:
