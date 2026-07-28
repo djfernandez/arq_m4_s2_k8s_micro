@@ -10,6 +10,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.client.HttpClientErrorException;
 
 import com.tecsup.app.micro.orden.domain.exception.InvalidOrderDataException;
 import com.tecsup.app.micro.orden.domain.exception.OrderNotFoundException;
@@ -67,6 +68,16 @@ public class GlobalExceptionHandler {
         errors);
 
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+  }
+
+  @ExceptionHandler(HttpClientErrorException.NotFound.class)
+  public ResponseEntity<ErrorResponse> handleDownstreamNotFound(HttpClientErrorException.NotFound ex) {
+    log.error("Downstream resource not found: {}", ex.getMessage());
+    ErrorResponse error = new ErrorResponse(
+        HttpStatus.NOT_FOUND.value(),
+        "User not found",
+        LocalDateTime.now());
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
   }
 
   /**

@@ -38,7 +38,7 @@ public class CreateOrdertUseCase {
     }
 
     UserDTO userDTO = userClient.getUserById(order.getUserId(), token);
-    if (userDTO == null) {
+    if (userDTO == null || userDTO.getId() == null) {
       throw new InvalidOrderDataException("User with ID " + order.getUserId() + " does not exist.");
     }
 

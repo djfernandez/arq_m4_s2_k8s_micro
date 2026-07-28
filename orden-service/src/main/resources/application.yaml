@@ -68,7 +68,7 @@ logging:
 # Formato: http://<service-name>.<namespace>.svc.cluster.local
 user:
   service:
-    url: ${USER_SERVICE_URL:http://localhost:30081}
+    url: ${USER_SERVICE_URL:http://localhost:8081}
 
 # ============================================
 # PRODUCT SERVICE URL - Comunicación entre servicios
@@ -77,7 +77,7 @@ user:
 # Formato: http://<service-name>.<namespace>.svc.cluster.local
 product:
   service:
-    url: ${PRODUCT_SERVICE_URL:http://localhost:30082}
+    url: ${PRODUCT_SERVICE_URL:http://localhost:8082}
 # ============================================
 # JWT CONFIGURATION (Sesión 2)
 # ============================================
