@@ -13,7 +13,7 @@ spec:
   # ========================================
   # Número de réplicas (copias)
   # ========================================
-  replicas: 1  # Empezamos con 1 pod
+  replicas: 1 # Empezamos con 1 pod
 
   # ========================================
   # Selector: ¿Qué pods gestionar?
@@ -40,7 +40,8 @@ spec:
           # imagePullPolicy:
           # - Never: Solo usar imagen local (desarrollo)
           # - Always: Siempre descargar (producción)
-          imagePullPolicy: Never
+          # - IfNotPresent: para local en Docker Desktop, si no está local, la descarga (desarrollo)
+          imagePullPolicy: IfNotPresent
 
           # Puerto del contenedor
           ports:

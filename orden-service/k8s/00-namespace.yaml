@@ -1,0 +1,12 @@
+# ============================================
+# NAMESPACE
+# ============================================
+# Agrupa recursos relacionados
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: orden-service
+  labels:
+    name: orden-service
+    environment: local
