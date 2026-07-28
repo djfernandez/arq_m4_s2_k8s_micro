@@ -9,7 +9,7 @@ WORKDIR /app
 COPY target/*.jar /app/orden-service.jar
 
 # Puerto
-EXPOSE 8082
+EXPOSE 8083
 
 # Variables de entorno
 ENV JAVA_OPTS="-Xmx512m -Xms256m"

@@ -63,6 +63,13 @@ spec:
                   name: orden-service-config
                   key: USER_SERVICE_URL
 
+            # Desde ConfigMap
+            - name: PRODUCT_SERVICE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: orden-service-config
+                  key: PRODUCT_SERVICE_URL
+
             - name: DB_URL
               valueFrom:
                 configMapKeyRef:
